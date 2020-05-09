@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Behaviour monitoring</string>
+    <string name="ax">"Ax: "</string>
+    <string name="ax_string">"Ax: "</string>
+    <string name="ax_value">3.0</string>
+    <string name="ay_string">"Ay: "</string>
+    <string name="az_string">"Az: "</string>
+</resources>
