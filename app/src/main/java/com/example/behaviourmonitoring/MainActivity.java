@@ -41,15 +41,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onResume(){
         Log.i("MyLog", "onResume called");
         super.onResume();
-        //List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        //for ( Sensor s : sensors){
-        //    sensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_NORMAL);
-        //}
         Sensor accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_NORMAL);
-        //sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_FASTEST);
-        //sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_GAME);
-        //sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
@@ -62,16 +55,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event){
         double ax, ay, az;
+        long time;
         Log.i("MyLog", "onSensorChanged called");
         if (event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
             ax = event.values[0];
             ay = event.values[1];
             az = event.values[2];
+            time = System.currentTimeMillis();
             mAxValue.setText(String.format("%.3f", ax));
             mAyValue.setText(String.format("%.3f", ay));
             mAzValue.setText(String.format("%.3f", az));
-            saveFile(fileName, "onCreate\n");
-            Log.i("MyLog", String.format("%.5f, %.5f, %.5f", ax, ay, az));
+            Log.i("MyLog", String.format("%d,%.3f,%.3f,%.3f\n", time, ax, ay, az));
+            saveFile(fileName, String.format("%d,%.3f,%.3f,%.3f\n", time, ax, ay, az));
         }
     }
 
@@ -81,25 +76,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void saveFile(String file, String str) {
         try {
-            Log.i("MyLog", "Save0");
-            //FileOutputStream fileOutputStream = openFileOutput(file, Context.MODE_WORLD_READABLE);
-            //FileOutputStream fileOutputStream = openFileOutput(file, Context.MODE_PRIVATE);
+            Log.i("MyLog", "SaveFile called");
             FileOutputStream fileOutputStream = openFileOutput(file, Context.MODE_APPEND);
-            //FileOutputStream fileOutputStream = new FileOutputStream("/data/data/test.txt");
-            // FileOutputStream fileOutputStream = openFileOutput("/data/data/test.txt", Context.MODE_PRIVATE);
-            //MediaScannerConnection.scanFile(this, new String[]{getFilesDir()+"/"+file}, null, null);
             fileOutputStream.write(str.getBytes());
-            //fileOutputStream.flush();
             fileOutputStream.close();
-            Log.i("MyLog", "Save");
-            //getFilesDir().mkdirs();
-            Log.i("MyLog", getFilesDir().toString());
-            Log.i("MyLog", getFilesDir().getPath());
-            //Log.i("MyLog", getExternal.toString());
-            //Log.i("MyLog", getExternalFilesDir().getPath());
         } catch (IOException e) {
             e.printStackTrace();
-            Log.i("MyLog", "Error");
+            Log.e("MyLog", "IOException Error");
         }
     }
 }
