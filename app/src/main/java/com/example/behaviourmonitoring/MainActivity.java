@@ -1,20 +1,28 @@
 package com.example.behaviourmonitoring;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.media.MediaScannerConnection;
+import android.os.Environment;
 import android.widget.TextView;
 import android.os.Bundle;
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private double ax = 4.0;
     private TextView mAxValue, mAyValue, mAzValue;
     private SensorManager sensorManager;
+    private String fileName = "test.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +70,36 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mAxValue.setText(String.format("%.3f", ax));
             mAyValue.setText(String.format("%.3f", ay));
             mAzValue.setText(String.format("%.3f", az));
-
+            saveFile(fileName, "onCreate\n");
             Log.i("MyLog", String.format("%.5f, %.5f, %.5f", ax, ay, az));
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy){
+    }
+
+    public void saveFile(String file, String str) {
+        try {
+            Log.i("MyLog", "Save0");
+            //FileOutputStream fileOutputStream = openFileOutput(file, Context.MODE_WORLD_READABLE);
+            //FileOutputStream fileOutputStream = openFileOutput(file, Context.MODE_PRIVATE);
+            FileOutputStream fileOutputStream = openFileOutput(file, Context.MODE_APPEND);
+            //FileOutputStream fileOutputStream = new FileOutputStream("/data/data/test.txt");
+            // FileOutputStream fileOutputStream = openFileOutput("/data/data/test.txt", Context.MODE_PRIVATE);
+            //MediaScannerConnection.scanFile(this, new String[]{getFilesDir()+"/"+file}, null, null);
+            fileOutputStream.write(str.getBytes());
+            //fileOutputStream.flush();
+            fileOutputStream.close();
+            Log.i("MyLog", "Save");
+            //getFilesDir().mkdirs();
+            Log.i("MyLog", getFilesDir().toString());
+            Log.i("MyLog", getFilesDir().getPath());
+            //Log.i("MyLog", getExternal.toString());
+            //Log.i("MyLog", getExternalFilesDir().getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.i("MyLog", "Error");
+        }
     }
 }
