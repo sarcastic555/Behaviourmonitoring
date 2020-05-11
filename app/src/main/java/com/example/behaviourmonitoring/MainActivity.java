@@ -12,6 +12,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
+import java.util.Calendar;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView mAxValue, mAyValue, mAzValue;
     private SensorManager sensorManager;
     private String fileName = "test.txt";
+    private int daqPeriod = 500000; // us
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mAxValue = findViewById(R.id.ax_value);
         mAyValue = findViewById(R.id.ay_value);
         mAzValue = findViewById(R.id.az_value);
+        // TYPE_GYROSCOPE and Sensor.TYPE_LINEAR_ACCELERATION cannot be used!
+        Sensor accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(this, accel, daqPeriod);
 
         Log.i("MyLog", "onCreate called");
     }
@@ -42,14 +47,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Log.i("MyLog", "onResume called");
         super.onResume();
         Sensor accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
     protected void onPause(){
         Log.i("MyLog", "onPause called");
         super.onPause();
-        sensorManager.unregisterListener(this);
+        //sensorManager.unregisterListener(this);
     }
 
     @Override
@@ -57,26 +61,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         double ax, ay, az;
         long time;
         Log.i("MyLog", "onSensorChanged called");
-        if (event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
-            ax = event.values[0];
-            ay = event.values[1];
-            az = event.values[2];
-            time = System.currentTimeMillis();
-            mAxValue.setText(String.format("%.3f", ax));
-            mAyValue.setText(String.format("%.3f", ay));
-            mAzValue.setText(String.format("%.3f", az));
-            Log.i("MyLog", String.format("%d,%.3f,%.3f,%.3f\n", time, ax, ay, az));
-            saveFile(fileName, String.format("%d,%.3f,%.3f,%.3f\n", time, ax, ay, az));
-        }
+        ax = event.values[0];
+        ay = event.values[1];
+        az = event.values[2];
+        time = System.currentTimeMillis();
+        mAxValue.setText(String.format("%.3f", ax));
+        mAyValue.setText(String.format("%.3f", ay));
+        mAzValue.setText(String.format("%.3f", az));
+        Log.i("MyLog", String.format("%d,%.3f,%.3f,%.3f\n", time, ax, ay, az));
+        saveFile(String.format("%d,%.3f,%.3f,%.3f\n", time, ax, ay, az));
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy){
     }
 
-    public void saveFile(String file, String str) {
+    public void saveFile(String str) {
         try {
             Log.i("MyLog", "SaveFile called");
+            Calendar cal = Calendar.getInstance();
+            String file = String.format("%d%02d%02d.csv", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)+1, cal.get(Calendar.DATE));
             FileOutputStream fileOutputStream = openFileOutput(file, Context.MODE_APPEND);
             fileOutputStream.write(str.getBytes());
             fileOutputStream.close();
