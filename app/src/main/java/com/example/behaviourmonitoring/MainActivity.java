@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView mAxValue, mAyValue, mAzValue;
     private SensorManager sensorManager;
     private String fileName = "test.txt";
-    private int daqPeriod = 500000; // us
+    private int daqPeriod = 100000; // us
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
